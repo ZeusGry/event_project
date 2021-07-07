@@ -15,13 +15,13 @@ public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @ManyToOne
-    User user;
+    private User user;
     @ManyToOne
     @JsonIgnore
     @ToString.Exclude
-    Event event;
-    LocalDateTime postTime;
-    String content;
+    private Event event;
+    private LocalDateTime postTime;
+    private String content;
 }

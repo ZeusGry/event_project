@@ -15,22 +15,22 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @Column(unique = true)
-    String login;
-    String password;
+    private String login;
+    private String password;
     @Column(unique = true)
-    String email;
+    private String email;
     @Column(unique = true)
-    String showName;
+    private String showName;
     @Enumerated(EnumType.STRING)
-    Role role;
-    @OneToMany(mappedBy = "user")
+    private Role role;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
-    List<Participant> participant;
-    @OneToMany(mappedBy = "user")
+    private List<Participant> participant;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
-    List<Organizer> organizer;
+    private List<Organizer> organizer;
 }

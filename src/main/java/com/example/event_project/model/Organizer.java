@@ -16,11 +16,11 @@ public class Organizer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @ManyToOne
-    User user;
+    private User user;
     @ManyToOne
-    Event event;
-    String description;
+    private Event event;
+    private String description;
 
 }

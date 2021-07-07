@@ -16,10 +16,10 @@ public class Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @ManyToOne
-    User user;
+    private User user;
     @ManyToOne
-    Event event;
-    Boolean accepted;
+    private Event event;
+    private Boolean accepted;
 }

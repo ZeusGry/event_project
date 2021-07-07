@@ -15,12 +15,12 @@ public class Adress {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String city;
-    String street;
-    String numberOfBuilding;
-    @OneToMany
+    private Long id;
+    private String city;
+    private String street;
+    private String numberOfBuilding;
+    @OneToMany(mappedBy = "adress", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
-    List<Event> event;
+    private List<Event> event;
 }

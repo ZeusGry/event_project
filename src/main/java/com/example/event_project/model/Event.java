@@ -2,6 +2,7 @@ package com.example.event_project.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -16,25 +17,30 @@ public class Event {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
     @Column(unique = true)
-    String name;
-    LocalDateTime startTime;
-    @ManyToOne
-    Adress adress;
-    Boolean acces;
-    String email;
-    String phoneNumber;
+    private String name;
+    private LocalDateTime startTime;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Adress adress;
+    private Boolean acces;
+    private String email;
+    private String phoneNumber;
     @OneToMany(mappedBy = "event")
     @JsonIgnore
     @ToString.Exclude
-    List<Organizer> organizers;
-    @OneToMany(mappedBy = "event")
+    private List<Organizer> organizers;
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
-    List<Participant> participants;
-    @OneToMany
+    private List<Participant> participants;
+    @Formula("(SELECT COUNT(*) from participant WHERE participant.event_id = id)")
+    private Integer participantCount;
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
     @JsonIgnore
     @ToString.Exclude
-    List<Comment> comments;
+    private List<Comment> comments;
+    @Formula("(SELECT COUNT(*) from comment WHERE comment.event_id = id)")
+    private Integer commentCount;
+
 }
