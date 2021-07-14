@@ -8,6 +8,8 @@ import com.example.event_project.model.dto.mapper.AdressMapper;
 import com.example.event_project.model.dto.mapper.EventMapper;
 import com.example.event_project.repository.AdressRepository;
 import com.example.event_project.repository.EventRepository;
+import com.example.event_project.repository.OrganizerRepository;
+import com.example.event_project.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,8 @@ public class EventService {
     private final EventMapper eventMapper;
     private final AdressRepository adressRepository;
     private final AdressMapper adressMapper;
+    private final ParticipantRepository participantRepository;
+    private final OrganizerRepository organizerRepository;
 
 
     public List<EventDto> getListOfEventsDto() {
@@ -70,4 +74,24 @@ public class EventService {
     }
 
 
+    public List<EventDto> getListOfEventsDtoAccepted(Long id) {
+        return participantRepository.findByUserIdAndAccepted(id, true)
+                .stream()
+                .map(event -> eventMapper.eventToDto(event))
+                .collect(Collectors.toList());
+    }
+
+    public List<EventDto> getListOfEventsDtoNotAccepted(Long id) {
+        return participantRepository.findByUserIdAndAccepted(id, false)
+                .stream()
+                .map(event -> eventMapper.eventToDto(event))
+                .collect(Collectors.toList());
+    }
+
+    public List<EventDto> getListOfEventsDtoOrganized(Long id) {
+        return organizerRepository.findByUserId(id)
+                .stream()
+                .map(event -> eventMapper.eventToDto(event))
+                .collect(Collectors.toList());
+    }
 }

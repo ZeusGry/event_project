@@ -14,4 +14,5 @@ public class EventDto {
     String phoneNumber;
     Integer participantCount;
     Integer commentCount;
+    AdressDto adress;
 }

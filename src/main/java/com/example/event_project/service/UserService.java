@@ -53,10 +53,10 @@ public class UserService {
         }
     }
 
-    public void deleteUser(UserDto dto) {
-        Optional<User> optUser = userRepository.findById(dto.getId());
+    public void deleteUser(Long id) {
+        Optional<User> optUser = userRepository.findById(id);
         if (optUser.isPresent()) {
-            userRepository.deleteById(dto.getId());
+            userRepository.deleteById(id);
         }
     }
 }

@@ -24,6 +24,21 @@ public class RestEventController {
         return eventService.getListOfEventsDto();
     }
 
+    @GetMapping("/accepted")
+    public List<EventDto> getListAccepted(@PathVariable Long id) {
+        return eventService.getListOfEventsDtoAccepted(id);
+    }
+
+    @GetMapping("/notaccepted")
+    public List<EventDto> getListNotAccepted(@PathVariable Long id) {
+        return eventService.getListOfEventsDtoNotAccepted(id);
+    }
+
+    @GetMapping("/organizer")
+    public List<EventDto> getListOrganized(@PathVariable Long id) {
+        return eventService.getListOfEventsDtoOrganized(id);
+    }
+
     @GetMapping("{Id}")
     public EventDto get(@PathVariable Long Id) {
         return eventService.getEventDto(Id);

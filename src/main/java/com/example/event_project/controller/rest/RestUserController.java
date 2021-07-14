@@ -38,7 +38,7 @@ public class RestUserController {
     }
 
     @DeleteMapping()
-    public void delete(@RequestBody UserDto dto) {
-        userService.deleteUser(dto);
+    public void delete(@PathVariable Long Id) {
+        userService.deleteUser(Id);
     }
 }
