@@ -2,7 +2,6 @@ package com.example.event_project.service;
 
 import com.example.event_project.model.Adress;
 import com.example.event_project.model.Event;
-import com.example.event_project.model.dto.AdressDto;
 import com.example.event_project.model.dto.EventDto;
 import com.example.event_project.model.dto.mapper.AdressMapper;
 import com.example.event_project.model.dto.mapper.EventMapper;
@@ -43,15 +42,14 @@ public class EventService {
         return eventMapper.eventToDto(optEvent.orElse(new Event()));
     }
 
-    public Event addEvent(EventDto eventDto, AdressDto adressDto) {
+    public Event addEvent(EventDto eventDto) {
         Adress adress;
-        if (adressDto.getId() == null) {
-            adress = adressMapper.dtoToAdress(adressDto);
-            adress = adressRepository.save(adress);
-        } else {
-            adress = adressRepository.findById(adressDto.getId())
-                    .get();
-        }
+        Optional<Adress> optAdress = adressRepository.findByCityAndAndStreetAndNumberOfBuilding(eventDto.getAdress()
+                .getCity(), eventDto.getAdress()
+                .getStreet(), eventDto.getAdress()
+                .getNumberOfBuilding());
+        adress = optAdress.orElse(adressMapper.dtoToAdress(eventDto.getAdress()));
+        adress = adressRepository.save(adress);
         Event event = eventMapper.dtoToEvent(eventDto);
         event.setAdress(adress);
         return eventRepository.save(event);

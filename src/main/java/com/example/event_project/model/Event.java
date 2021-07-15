@@ -36,7 +36,7 @@ public class Event {
     private List<Participant> participants;
     @Formula("(SELECT COUNT(*) from participant WHERE participant.event_id = id)")
     private Integer participantCount;
-    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "event", fetch = FetchType.EAGER)
     @JsonIgnore
     @ToString.Exclude
     private List<Comment> comments;

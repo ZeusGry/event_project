@@ -1,6 +1,5 @@
 package com.example.event_project.controller.rest;
 
-import com.example.event_project.model.dto.AdressDto;
 import com.example.event_project.model.dto.EventDto;
 import com.example.event_project.service.EventService;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +23,17 @@ public class RestEventController {
         return eventService.getListOfEventsDto();
     }
 
-    @GetMapping("/accepted")
+    @GetMapping("/accepted/{id}")
     public List<EventDto> getListAccepted(@PathVariable Long id) {
         return eventService.getListOfEventsDtoAccepted(id);
     }
 
-    @GetMapping("/notaccepted")
+    @GetMapping("/notaccepted/{id}")
     public List<EventDto> getListNotAccepted(@PathVariable Long id) {
         return eventService.getListOfEventsDtoNotAccepted(id);
     }
 
-    @GetMapping("/organizer")
+    @GetMapping("/organizer/{id}")
     public List<EventDto> getListOrganized(@PathVariable Long id) {
         return eventService.getListOfEventsDtoOrganized(id);
     }
@@ -45,8 +44,8 @@ public class RestEventController {
     }
 
     @PostMapping()
-    public void add(@RequestBody EventDto eventDto, AdressDto adressDto) {
-        eventService.addEvent(eventDto, adressDto);
+    public void add(@RequestBody EventDto eventDto) {
+        eventService.addEvent(eventDto);
     }
 
     @PatchMapping()

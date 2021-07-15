@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,7 +36,10 @@ public class CommentService {
         if (optEvent.isPresent()) {
             Comment comment = commentMapper.dtoToComment(dto);
             comment.setEvent(optEvent.get());
-            return commentMapper.commentToDto(commentRepository.save(comment));
+            comment.setUser(null); // małe rozwiązanie na później
+            comment.setPostTime(LocalDateTime.now());
+            comment = commentRepository.save(comment);
+            return commentMapper.commentToDto(comment);
         }
         throw new RuntimeException();
     }

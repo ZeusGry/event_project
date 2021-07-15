@@ -23,8 +23,11 @@ public class RestCommentController {
         return commentService.getComments(eventId);
     }
 
-    @PostMapping()
+    @PostMapping("{eventId}")
     public CommentDto add(@PathVariable Long eventId, @RequestBody CommentDto dto) {
+        // TODO
+        // Trzeba zrobić warstwę seciurity, by móc zapisać wraz z userem, bo sypie błędami
+
         return commentService.addComment(eventId, dto);
     }
 //             TODO
