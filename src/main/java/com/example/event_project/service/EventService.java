@@ -1,18 +1,19 @@
 package com.example.event_project.service;
 
-import com.example.event_project.model.Adress;
-import com.example.event_project.model.Event;
+import com.example.event_project.exceptions.EventNotFindException;
+import com.example.event_project.exceptions.UserNotFindException;
+import com.example.event_project.model.*;
 import com.example.event_project.model.dto.EventDto;
 import com.example.event_project.model.dto.mapper.AdressMapper;
 import com.example.event_project.model.dto.mapper.EventMapper;
-import com.example.event_project.repository.AdressRepository;
-import com.example.event_project.repository.EventRepository;
-import com.example.event_project.repository.OrganizerRepository;
-import com.example.event_project.repository.ParticipantRepository;
+import com.example.event_project.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.mail.MessagingException;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,12 +29,16 @@ public class EventService {
     private final AdressMapper adressMapper;
     private final ParticipantRepository participantRepository;
     private final OrganizerRepository organizerRepository;
+    private final UserRepository userRepository;
+    private final OrganizerToAddRepository organizerToAddRepository;
+    private final MailService mailService;
+    private final RoleRepository roleRepository;
 
 
     public List<EventDto> getListOfEventsDto() {
         return eventRepository.findAll()
                 .stream()
-                .map(event -> eventMapper.eventToDto(event))
+                .map(eventMapper::eventToDto)
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +47,7 @@ public class EventService {
         return eventMapper.eventToDto(optEvent.orElse(new Event()));
     }
 
-    public Event addEvent(EventDto eventDto) {
+    public EventDto addEvent(EventDto eventDto) {
         Adress adress;
         Optional<Adress> optAdress = adressRepository.findByCityAndAndStreetAndNumberOfBuilding(eventDto.getAdress()
                 .getCity(), eventDto.getAdress()
@@ -52,44 +57,109 @@ public class EventService {
         adress = adressRepository.save(adress);
         Event event = eventMapper.dtoToEvent(eventDto);
         event.setAdress(adress);
-        return eventRepository.save(event);
+        return eventMapper.eventToDto(eventRepository.save(event));
     }
 
-    public void updateEvent(EventDto dto) {
-        Optional<Event> optEvent = eventRepository.findById(dto.getId());
-        if (optEvent.isPresent()) {
-            optEvent.get()
-                    .setStartTime(dto.getStartTime());
-            eventRepository.save(optEvent.get());
-        }
-    }
-
-    public void deleteEvent(EventDto dto) {
+    public boolean deleteEvent(EventDto dto) {
         Optional<Event> optEvent = eventRepository.findById(dto.getId());
         if (optEvent.isPresent()) {
             eventRepository.deleteById(dto.getId());
+            return true;
         }
+        return false;
     }
 
 
     public List<EventDto> getListOfEventsDtoAccepted(Long id) {
         return participantRepository.findByUserIdAndAccepted(id, true)
                 .stream()
-                .map(event -> eventMapper.eventToDto(event))
+                .map(participant -> eventMapper.eventToDto(participant.getEvent()))
                 .collect(Collectors.toList());
     }
 
     public List<EventDto> getListOfEventsDtoNotAccepted(Long id) {
         return participantRepository.findByUserIdAndAccepted(id, false)
                 .stream()
-                .map(event -> eventMapper.eventToDto(event))
+                .map(participant -> eventMapper.eventToDto(participant.getEvent()))
                 .collect(Collectors.toList());
     }
 
     public List<EventDto> getListOfEventsDtoOrganized(Long id) {
         return organizerRepository.findByUserId(id)
                 .stream()
-                .map(event -> eventMapper.eventToDto(event))
+                .map(Organizer::getEvent)
+                .map(eventMapper::eventToDto)
                 .collect(Collectors.toList());
+    }
+
+    public void joinEvent(Long userId, Long eventId) throws EventNotFindException, UserNotFindException {
+        Optional<Event> optEvent = eventRepository.findById(eventId);
+        System.out.println(eventId);
+        System.out.println(userId);
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optEvent.isEmpty()) {
+            throw new EventNotFindException();
+        }
+        if (optUser.isEmpty()) {
+            throw new UserNotFindException();
+        }
+        Participant participant = new Participant();
+        participant.setEvent(optEvent.get());
+        participant.setUser(optUser.get());
+        participant.setAccepted(true);
+        participantRepository.save(participant);
+    }
+
+    public void quitEvent(Long userId, Long eventId) throws EventNotFindException, UserNotFindException {
+        Optional<Event> optEvent = eventRepository.findById(eventId);
+        Optional<User> optUser = userRepository.findById(userId);
+        if (optEvent.isEmpty()) {
+            throw new EventNotFindException();
+        }
+        if (optUser.isEmpty()) {
+            throw new UserNotFindException();
+        }
+        Optional<Participant> participantToRemove = participantRepository.findByUserIdAndEventId(optUser.get()
+                .getId(), optEvent.get()
+                .getId());
+        participantToRemove.ifPresent(participant -> participantRepository.deleteById(participant
+                .getId()));
+    }
+
+    public boolean isParticipiant(Long eventId, String userName) throws UserNotFindException {
+        Optional<User> optUser = userRepository.findByLogin(userName);
+        if (optUser.isEmpty()) {
+            throw new UserNotFindException();
+        }
+        Optional<Participant> optParticipant = participantRepository.findByUserIdAndEventId(optUser.get()
+                .getId(), eventId);
+        return optParticipant.isPresent();
+    }
+
+    public void setOrganizators(Long eventId, String creatorName, String[] organizators) throws MessagingException {
+        Optional<Event> optEvent = eventRepository.findById(eventId);
+        Optional<User> optUser = userRepository.findByLogin(creatorName);
+        if (optEvent.isPresent() && optUser.isPresent()) {
+            Event event = optEvent.get();
+            List<Organizer> organizerList = new ArrayList<>();
+            organizerRepository.save(new Organizer(optUser.get(), event));
+            for (String organizator : organizators) {
+                Optional<User> optOrganizator = userRepository.findByEmail(organizator);
+                if (optOrganizator.isPresent()) {
+                    organizerRepository.save(new Organizer(optOrganizator.get(), event));
+                    Optional<Role> tmpRole = roleRepository.findByName(ERole.ROLE_MODERATOR);
+                    optOrganizator.get()
+                            .getRoles()
+                            .add(tmpRole.get());
+                    userRepository.save(optOrganizator.get());
+                } else {
+                    organizerToAddRepository.save(new OrganizerToAdd(event, organizator));
+                    String encodedString = Base64.getEncoder()
+                            .encodeToString(organizator.getBytes());
+                    mailService.sendMail(organizator, "Zostań organizatorem", "Wejdz na link:\n" +
+                            "http://localhost:4200/register/" + encodedString + "\ni zarejestruj się już dziś jako organizator");
+                }
+            }
+        }
     }
 }

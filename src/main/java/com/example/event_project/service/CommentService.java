@@ -1,11 +1,15 @@
 package com.example.event_project.service;
 
+import com.example.event_project.exceptions.EventNotFindException;
+import com.example.event_project.exceptions.UserNotFindException;
 import com.example.event_project.model.Comment;
 import com.example.event_project.model.Event;
+import com.example.event_project.model.User;
 import com.example.event_project.model.dto.CommentDto;
 import com.example.event_project.model.dto.mapper.CommentMapper;
 import com.example.event_project.repository.CommentRepository;
 import com.example.event_project.repository.EventRepository;
+import com.example.event_project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,26 +26,31 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
 
     public List<CommentDto> getComments(Long id) {
         return commentRepository.findCommentByEvent_IdOrderByPostTime(id)
                 .stream()
-                .map(comment -> commentMapper.commentToDto(comment))
+                .map(commentMapper::commentToDto)
                 .collect(Collectors.toList());
     }
 
-    public CommentDto addComment(Long eventId, CommentDto dto) {
-        Optional<Event> optEvent = eventRepository.findById(eventId);
-        if (optEvent.isPresent()) {
-            Comment comment = commentMapper.dtoToComment(dto);
-            comment.setEvent(optEvent.get());
-            comment.setUser(null); // małe rozwiązanie na później
-            comment.setPostTime(LocalDateTime.now());
-            comment = commentRepository.save(comment);
-            return commentMapper.commentToDto(comment);
+    public CommentDto addComment(Long eventId, String userName, CommentDto dto) throws UserNotFindException, EventNotFindException {
+        Optional<User> optUser = userRepository.findByLogin(userName);
+        if (optUser.isEmpty()) {
+            throw new UserNotFindException();
         }
-        throw new RuntimeException();
+        Optional<Event> optEvent = eventRepository.findById(eventId);
+        if (optEvent.isEmpty()) {
+            throw new EventNotFindException();
+        }
+        Comment comment = commentMapper.dtoToComment(dto);
+        comment.setEvent(optEvent.get());
+        comment.setUser(optUser.get());
+        comment.setPostTime(LocalDateTime.now());
+        comment = commentRepository.save(comment);
+        return commentMapper.commentToDto(comment);
     }
 
     public void deleteComment(CommentDto dto) {

@@ -1,26 +1,28 @@
 package com.example.event_project.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class Role {
+public class OrganizerToAdd {
     @Id
-    @JsonIgnore
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ERole name;
+    @ManyToOne
+    Event event;
+    String userEmail;
 
-    public Role(ERole name) {
-        this.name = name;
+    public OrganizerToAdd(Event event, String userEmail) {
+        this.event = event;
+        this.userEmail = userEmail;
     }
 }

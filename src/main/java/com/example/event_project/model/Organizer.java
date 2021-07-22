@@ -23,4 +23,8 @@ public class Organizer {
     private Event event;
     private String description;
 
+    public Organizer(User user, Event event) {
+        this.user = user;
+        this.event = event;
+    }
 }
