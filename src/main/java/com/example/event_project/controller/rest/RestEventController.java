@@ -33,13 +33,8 @@ public class RestEventController {
     }
 
     @GetMapping("/accepted/{id}")
-    public ResponseEntity<?> getListAccepted(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.getListOfEventsDtoAccepted(id));
-    }
-
-    @GetMapping("/notaccepted/{id}")
-    public ResponseEntity<?> getListNotAccepted(@PathVariable Long id) {
-        return ResponseEntity.ok(eventService.getListOfEventsDtoNotAccepted(id));
+    public ResponseEntity<?> getListOfUserEvents(@PathVariable Long id) {
+        return ResponseEntity.ok(eventService.getListOfEventsDtoByUser(id));
     }
 
     @GetMapping("/organizer/{id}")
@@ -64,11 +59,6 @@ public class RestEventController {
             return ResponseEntity.badRequest()
                     .body(new MessageResponse("Error: Użytkownik nie istnieje"));
         }
-    }
-
-    @GetMapping("/part")
-    public ResponseEntity<?> isParticipiant() {
-        return ResponseEntity.ok(new PresentDto(true));
     }
 
     @PostMapping("/setOrg/{id}")

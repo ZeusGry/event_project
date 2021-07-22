@@ -70,15 +70,8 @@ public class EventService {
     }
 
 
-    public List<EventDto> getListOfEventsDtoAccepted(Long id) {
-        return participantRepository.findByUserIdAndAccepted(id, true)
-                .stream()
-                .map(participant -> eventMapper.eventToDto(participant.getEvent()))
-                .collect(Collectors.toList());
-    }
-
-    public List<EventDto> getListOfEventsDtoNotAccepted(Long id) {
-        return participantRepository.findByUserIdAndAccepted(id, false)
+    public List<EventDto> getListOfEventsDtoByUser(Long id) {
+        return participantRepository.findByUserId(id)
                 .stream()
                 .map(participant -> eventMapper.eventToDto(participant.getEvent()))
                 .collect(Collectors.toList());
@@ -106,7 +99,6 @@ public class EventService {
         Participant participant = new Participant();
         participant.setEvent(optEvent.get());
         participant.setUser(optUser.get());
-        participant.setAccepted(true);
         participantRepository.save(participant);
     }
 

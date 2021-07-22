@@ -21,5 +21,4 @@ public class Participant {
     private User user;
     @ManyToOne
     private Event event;
-    private Boolean accepted;
 }

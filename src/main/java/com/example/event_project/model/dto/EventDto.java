@@ -9,7 +9,6 @@ public class EventDto {
     Long id;
     String name;
     LocalDateTime startTime;
-    Boolean acces;
     String email;
     String phoneNumber;
     Integer participantCount;

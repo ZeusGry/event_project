@@ -24,7 +24,7 @@ public class RestUserController {
     }
 
     @GetMapping("{Id}")
-    public ResponseEntity<?> get(@PathVariable Long Id) {
+    public ResponseEntity<?> getUser(@PathVariable Long Id) {
         try {
             return ResponseEntity.ok(userService.findById(Id));
         } catch (UserNotFindException e) {
@@ -34,7 +34,7 @@ public class RestUserController {
     }
 
     @PatchMapping()
-    public ResponseEntity<?> update(@RequestBody UserDto dto) {
+    public ResponseEntity<?> updateRoles(@RequestBody UserDto dto) {
         try {
             userService.updateUser(dto);
             return ResponseEntity.status(HttpStatus.ACCEPTED)
@@ -46,7 +46,7 @@ public class RestUserController {
     }
 
     @DeleteMapping("{Id}")
-    public ResponseEntity<?> delete(@PathVariable Long Id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long Id) {
         try {
             userService.deleteUser(Id);
             return ResponseEntity.ok()

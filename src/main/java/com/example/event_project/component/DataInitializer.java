@@ -6,8 +6,10 @@ import com.example.event_project.model.User;
 import com.example.event_project.repository.RoleRepository;
 import com.example.event_project.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -15,13 +17,17 @@ public class DataInitializer {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder encoder;
+
 
     @Autowired
-    public DataInitializer(RoleRepository roleRepository, UserRepository userRepository) {
+    public DataInitializer(RoleRepository roleRepository, UserRepository userRepository, PasswordEncoder encoder) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
+        this.encoder = encoder;
+
         System.out.println("działa");
-        //loadData();
+        loadData();
     }
 
     private void loadData() {
@@ -31,14 +37,13 @@ public class DataInitializer {
             roleRepository.save(role);
         }
 
-        Role role = new Role();
-        role.setName(ERole.ROLE_USER);
+        Optional<Role> role = roleRepository.findByName(ERole.ROLE_ADMIN);
         User admin = User.builder()
                 .email("admin@admin.pl")
                 .showName("admin")
                 .login("admin")
-                .password("adminadmin")
-                .roles(Set.of(role))
+                .password(encoder.encode("adminadmin"))
+                .roles(Set.of(role.get()))
                 .build();
 
         userRepository.save(admin);

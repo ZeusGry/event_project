@@ -23,7 +23,6 @@ public class Event {
     private LocalDateTime startTime;
     @ManyToOne(fetch = FetchType.EAGER)
     private Adress adress;
-    private Boolean acces;
     private String email;
     private String phoneNumber;
     @OneToMany(mappedBy = "event")

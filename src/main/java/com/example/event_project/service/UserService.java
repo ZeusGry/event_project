@@ -31,10 +31,6 @@ public class UserService {
     private final OrganizerRepository organizerRepository;
     private final ParticipantRepository participantRepository;
 
-    public Optional<User> checkUser(UserDto user) {
-        return userRepository.findByLoginAndPassword(user.getLogin(), user.getPassword());
-    }
-
     public List<UserDto> getUsers() {
         return userRepository.findAll()
                 .stream()
