@@ -133,16 +133,18 @@ public class EventService {
         Optional<User> optUser = userRepository.findByLogin(creatorName);
         if (optEvent.isPresent() && optUser.isPresent()) {
             Event event = optEvent.get();
+            // todo: nieużywane organizer list
             List<Organizer> organizerList = new ArrayList<>();
             organizerRepository.save(new Organizer(optUser.get(), event));
+            // todo: wciągnać to w metodę - powinieneś starać się trzymać max 2 zagłebienia
             for (String organizator : organizators) {
                 Optional<User> optOrganizator = userRepository.findByEmail(organizator);
                 if (optOrganizator.isPresent()) {
                     organizerRepository.save(new Organizer(optOrganizator.get(), event));
-                    Optional<Role> tmpRole = roleRepository.findByName(ERole.ROLE_MODERATOR);
+                    Role tmpRole = getRole(ERole.ROLE_MODERATOR);
                     optOrganizator.get()
                             .getRoles()
-                            .add(tmpRole.get());
+                            .add(tmpRole);
                     userRepository.save(optOrganizator.get());
                 } else {
                     organizerToAddRepository.save(new OrganizerToAdd(event, organizator));
@@ -153,5 +155,10 @@ public class EventService {
                 }
             }
         }
+    }
+
+    private Role getRole(ERole role) {
+        Optional<Role> tmpRole = roleRepository.findByName(role);
+        return tmpRole.orElseThrow(() -> new RuntimeException("Something is wrong with db!"));
     }
 }

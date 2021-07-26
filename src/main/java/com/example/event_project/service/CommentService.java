@@ -38,11 +38,11 @@ public class CommentService {
 
     public CommentDto addComment(Long eventId, String userName, CommentDto dto) throws UserNotFindException, EventNotFindException {
         Optional<User> optUser = userRepository.findByLogin(userName);
-        if (optUser.isEmpty()) {
+        if (!optUser.isPresent()) {
             throw new UserNotFindException();
         }
         Optional<Event> optEvent = eventRepository.findById(eventId);
-        if (optEvent.isEmpty()) {
+        if (!optEvent.isPresent()) {
             throw new EventNotFindException();
         }
         Comment comment = commentMapper.dtoToComment(dto);

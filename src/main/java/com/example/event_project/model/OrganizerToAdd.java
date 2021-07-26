@@ -17,6 +17,7 @@ public class OrganizerToAdd {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    // TODO: modyfikatory dostępu
     @ManyToOne
     Event event;
     String userEmail;

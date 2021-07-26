@@ -20,6 +20,7 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private ERole name;
 
+    // TODO: usunac konstruktor nieuzywany
     public Role(ERole name) {
         this.name = name;
     }

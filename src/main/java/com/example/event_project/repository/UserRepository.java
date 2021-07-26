@@ -8,6 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+    // todo : nieużywane metody
     Optional<User> findByLoginAndPassword(String login, String password);
 
     Optional<User> findByLoginOrEmailOrShowName(String login, String email, String showName);

@@ -1,7 +1,6 @@
 package com.example.event_project.controller.rest;
 
 import com.example.event_project.configuration.security.jwt.JwtUtils;
-import com.example.event_project.configuration.security.services.UserDetailsImpl;
 import com.example.event_project.model.*;
 import com.example.event_project.model.dto.payload.request.LoginRequest;
 import com.example.event_project.model.dto.payload.request.SingupRequest;
@@ -43,7 +42,7 @@ public class AuthController {
     private final OrganizerToAddRepository organizerToAddRepository;
     private final OrganizerRepository organizerRepository;
 
-
+    // TODO: spróbować przenieść impl. do serwisu
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -54,7 +53,7 @@ public class AuthController {
                 .setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User userDetails = (User) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -79,6 +78,9 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SingupRequest signUpRequest) {
+        // todo: przenieść więcej odpowiedzialności na serwisy
+        //  kontroler powinien być na tyle czysty żeby łatwo było odczytać scieżkę oraz
+        //  możliwe komunikaty/odpowiedzi
         if (userRepository.existsByLogin(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
