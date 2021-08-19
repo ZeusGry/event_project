@@ -12,10 +12,10 @@ Login is done on the basis of JWT.
 All data is saved in the database.  
 When adding additional organizers who are not users, he sends them a special e-mail for registration.
 
-###Frontend for aplication:
+### Frontend for aplication:
 [Frontend](https://github.com/ZeusGry/EventFrontend)
 
-###application.properties:
+### application.properties:
 spring.datasource.url=  
 spring.datasource.password=
 spring.datasource.username=
