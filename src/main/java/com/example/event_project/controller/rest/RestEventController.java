@@ -33,11 +33,13 @@ public class RestEventController {
     }
 
     @GetMapping("/accepted/{id}")
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> getListOfUserEvents(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getListOfEventsDtoByUser(id));
     }
 
     @GetMapping("/organizer/{id}")
+    @RolesAllowed({ "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> getListOrganized(@PathVariable Long id) {
         return ResponseEntity.ok(eventService.getListOfEventsDtoOrganized(id));
     }
@@ -48,6 +50,7 @@ public class RestEventController {
     }
 
     @GetMapping("/isParticipiant/{id}")
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> isParticipiant(@PathVariable Long id, @RequestHeader(name = "Authorization") String token) {
         String name = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         System.out.println(name);
@@ -62,6 +65,7 @@ public class RestEventController {
     }
 
     @PostMapping("/setOrg/{id}")
+    @RolesAllowed({ "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> setOrganizators(@PathVariable Long id, @RequestBody String[] organizators, @RequestHeader(name = "Authorization") String token) {
         String name = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         try {
@@ -85,7 +89,7 @@ public class RestEventController {
 
     @PatchMapping("/join")
     @CrossOrigin
-    // @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> joinEvent(@RequestParam Long userId, @RequestParam Long eventId) {
         try {
             eventService.joinEvent(userId, eventId);

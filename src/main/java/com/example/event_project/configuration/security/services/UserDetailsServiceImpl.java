@@ -1,6 +1,5 @@
 package com.example.event_project.configuration.security.services;
 
-import com.example.event_project.model.User;
 import com.example.event_project.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,9 +18,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByLogin(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + username));
 
-        return UserDetailsImpl.build(user);
+        return userRepository.findByLogin(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not Found with login: " + username));
     }
 }

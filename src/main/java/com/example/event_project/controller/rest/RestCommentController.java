@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @Slf4j
@@ -20,26 +21,25 @@ import java.util.List;
 @RequestMapping("api/Comments")
 @RequiredArgsConstructor
 public class RestCommentController {
-    private final EventService eventService;
     private final CommentService commentService;
     private final JwtUtils jwtUtils;
 
 
+
     @GetMapping("{eventId}")
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<List<CommentDto>> getCommentsForEvent(@PathVariable Long eventId) {
         return ResponseEntity.ok(commentService.getComments(eventId));
     }
 
     @PostMapping("{eventId}")
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<CommentDto> add(@PathVariable Long eventId, @RequestHeader(name = "Authorization") String token, @RequestBody CommentDto dto) {
         String name = jwtUtils.getUserNameFromJwtToken(token.substring(7));
         try {
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(commentService.addComment(eventId, name, dto));
-        } catch (UserNotFindException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .build();
-        } catch (EventNotFindException e) {
+        } catch (UserNotFindException | EventNotFindException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .build();
         }
@@ -47,6 +47,7 @@ public class RestCommentController {
 
 
     @DeleteMapping()
+    @RolesAllowed({ "ROLE_ADMIN" })
     public void delete(@RequestBody CommentDto dto) {
         commentService.deleteComment(dto);
     }

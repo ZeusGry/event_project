@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
+
 @Slf4j
 @RestController
 @CrossOrigin(origins = "http://localhost:4200")
@@ -19,11 +21,13 @@ public class RestUserController {
     private final UserService userService;
 
     @GetMapping
+    @RolesAllowed({ "ROLE_ADMIN" })
     public ResponseEntity<?> getList() {
         return ResponseEntity.ok(userService.getUsers());
     }
 
     @GetMapping("{Id}")
+    @RolesAllowed({ "ROLE_USER", "ROLE_ADMIN", "ROLE_MODERATOR" })
     public ResponseEntity<?> getUser(@PathVariable Long Id) {
         try {
             return ResponseEntity.ok(userService.findById(Id));
@@ -34,6 +38,7 @@ public class RestUserController {
     }
 
     @PatchMapping()
+    @RolesAllowed({ "ROLE_ADMIN" })
     public ResponseEntity<?> updateRoles(@RequestBody UserDto dto) {
         try {
             userService.updateUser(dto);
@@ -46,6 +51,7 @@ public class RestUserController {
     }
 
     @DeleteMapping("{Id}")
+    @RolesAllowed({ "ROLE_ADMIN" })
     public ResponseEntity<?> deleteUser(@PathVariable Long Id) {
         try {
             userService.deleteUser(Id);

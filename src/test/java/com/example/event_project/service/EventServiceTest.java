@@ -72,7 +72,7 @@ public class EventServiceTest {
         }
 
         @Test
-        void eVentCanBeAddedTest() {
+        void eventCanBeAddedTest() {
             List<EventDto> list = eventService.getListOfEventsDto();
             Assertions.assertEquals(1, list.size());
         }

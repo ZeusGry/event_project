@@ -9,7 +9,6 @@ import org.mapstruct.Mappings;
 
 @Mapper
 public interface UserMapper {
-    User dtoToUser(UserDto dto);
 
     @Mappings({
             @Mapping(target = "roles", source = "user.roles")})

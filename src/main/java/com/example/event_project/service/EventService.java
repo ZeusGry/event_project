@@ -133,25 +133,36 @@ public class EventService {
         Optional<User> optUser = userRepository.findByLogin(creatorName);
         if (optEvent.isPresent() && optUser.isPresent()) {
             Event event = optEvent.get();
-            List<Organizer> organizerList = new ArrayList<>();
             organizerRepository.save(new Organizer(optUser.get(), event));
-            for (String organizator : organizators) {
-                Optional<User> optOrganizator = userRepository.findByEmail(organizator);
-                if (optOrganizator.isPresent()) {
-                    organizerRepository.save(new Organizer(optOrganizator.get(), event));
-                    Optional<Role> tmpRole = roleRepository.findByName(ERole.ROLE_MODERATOR);
-                    optOrganizator.get()
-                            .getRoles()
-                            .add(tmpRole.get());
-                    userRepository.save(optOrganizator.get());
-                } else {
-                    organizerToAddRepository.save(new OrganizerToAdd(event, organizator));
-                    String encodedString = Base64.getEncoder()
-                            .encodeToString(organizator.getBytes());
-                    mailService.sendMail(organizator, "Zostań organizatorem", "Wejdz na link:\n" +
-                            "http://localhost:4200/register/" + encodedString + "\ni zarejestruj się już dziś jako organizator");
-                }
+            iterareForOrganizators(organizators, event);
+        }
+    }
+
+    private void iterareForOrganizators(String[] organizators, Event event) throws MessagingException {
+        for (String organizator : organizators) {
+            Optional<User> optOrganizator = userRepository.findByEmail(organizator);
+            if (optOrganizator.isPresent()) {
+                organizerRepository.save(new Organizer(optOrganizator.get(), event));
+                giveNewRole(optOrganizator.get());
+            } else {
+                sendMail(event, organizator);
             }
         }
+    }
+
+    private void giveNewRole(User optOrganizator) {
+        Optional<Role> tmpRole = roleRepository.findByName(ERole.ROLE_MODERATOR);
+        optOrganizator
+                .getRoles()
+                .add(tmpRole.get());
+        userRepository.save(optOrganizator);
+    }
+
+    private void sendMail(Event event, String organizator) throws MessagingException {
+        organizerToAddRepository.save(new OrganizerToAdd(event, organizator));
+        String encodedString = Base64.getEncoder()
+                .encodeToString(organizator.getBytes());
+        mailService.sendMail(organizator, "Zostań organizatorem", "Wejdz na link:\n" +
+                "http://localhost:4200/register/" + encodedString + "\ni zarejestruj się już dziś jako organizator");
     }
 }

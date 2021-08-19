@@ -15,11 +15,11 @@ import javax.persistence.*;
 public class OrganizerToAdd {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @ManyToOne
-    Event event;
-    String userEmail;
+    private Event event;
+    private String userEmail;
 
     public OrganizerToAdd(Event event, String userEmail) {
         this.event = event;

@@ -27,6 +27,7 @@ public class DataInitializer {
         this.encoder = encoder;
 
         System.out.println("działa");
+        if (roleRepository.findAll().isEmpty())
         loadData();
     }
 
